@@ -21,5 +21,4 @@ gem 'syslog',             '~> 0.3.0'
 gem 'puppet_metadata',    '~> 5.3', require: false
 gem 'voxpupuli-puppet-lint-plugins', '>= 6.0', '< 8'
 gem 'metadata_json_deps', require: false
-gem 'syslog'
 # vim: syntax=ruby
