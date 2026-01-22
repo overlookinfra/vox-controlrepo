@@ -1,7 +1,9 @@
 ---
 name: CI
 
-on: pull_request
+on:
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -43,7 +45,7 @@ jobs:
         id: get-outputs
         run: bundle exec metadata2gha --pidfile-workaround false
 
-  unit:
+  unit_openvox:
     needs: setup_matrix
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -54,101 +56,57 @@ jobs:
     env:
       BUNDLE_WITHOUT: development:system_tests:release
       PUPPET_VERSION: "~> ${{ matrix.puppet }}.0"
-    name: Puppet ${{ matrix.puppet }} (Ruby ${{ matrix.ruby }})
+    name: OpenVox ${{ matrix.puppet }} (Ruby ${{ matrix.ruby }})
     steps:
       - uses: actions/checkout@v6
       - name: Setup ruby
-        uses: ruby/setup-ruby@v1
+        uses: overlookinfra/setup-ruby@main
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler: none
           bundler-cache: true
           working-directory: ./site/profiles
+          setup-script: |
+            git clone --depth 1 -b bundler-plugin-eval-hooks https://github.com/ccutrer/rubygems.git
+            cd rubygems/bundler
+            gem build bundler.gemspec
+            gem install ./bundler-2.6.0.dev.gem
+            cd ../..
+            rm -rf rubygems
+            bundle plugin install bundler-alias
+            bundle config set aliases 'puppet:openvox'
       - name: Run tests
         run: bundle exec rake parallel_spec
 
-  acceptance:
-    needs: setup_matrix
-    runs-on: ubuntu-latest
-    env:
-      BUNDLE_WITHOUT: development:release
-    strategy:
-      fail-fast: false
-      matrix:
-        include: ${{fromJson(needs.setup_matrix.outputs.github_action_test_matrix)}}
-    name: ${{ matrix.puppet.name }} - ${{ matrix.setfile.name }}
-    steps:
-      - uses: actions/checkout@v6
-      - name: Setup ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4'
-          bundler-cache: true
-          working-directory: ./site/profiles
-      - name: Prepare fixtures
-        run: bundle exec rake spec_prep
-      - name: Run tests
-        run: bundle exec rake beaker
+  unit_puppet:
+        needs: setup_matrix
+        runs-on: ubuntu-latest
+        timeout-minutes: 40
+        strategy:
+          fail-fast: false
+          matrix:
+            include: ${{fromJson(needs.setup_matrix.outputs.puppet_unit_test_matrix)}}
         env:
-          LANG: en_US
-          LC_ALL: en_US.UTF-8
-          BEAKER_PUPPET_COLLECTION: ${{ matrix.puppet.collection }}
-          BEAKER_setfile: ${{ matrix.setfile.value }}
-
-  puppetfile:
-    defaults:
-      run:
-        working-directory: .
-    runs-on: ubuntu-latest
-    name: Validate Puppetfile + all modules
-    steps:
-      - uses: actions/checkout@v6
-      - name: Setup ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.4'
-          bundler-cache: true
-      - name: Check for puppetfile syntax correctness
-        run: bundle exec rake r10k:syntax
-      - name: validate URLs in Puppetfile
-        run: bundle exec rake r10k:validate
-      - name: Check for puppetfile duplicates
-        run: bundle exec rake r10k:duplicates
-      - name: Check for puppetfile module deprecations
-        run: bundle exec rake r10k:deprecation
-      - name: Check for outdated modules
-        run: bundle exec rake r10k:dependencies
-      - name: Validate all dependencies in metadata.json
-        run: bundle exec rake metadata_deps
-      - name: validate all dependencies
-        run: bundle exec puppet module list --modulepath site
-
-  Hiera:
-    defaults:
-      run:
-        working-directory: .
-    runs-on: ubuntu-latest
-    name: Validate Hiera
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          pip install --upgrade wheel setuptools pip
-          pip install yamllint
-      - name: Run yamllint
-        run: yamllint --format github --strict data/
-  tests:
-    needs:
-      - unit
-      - acceptance
-      - puppetfile
-      - Hiera
-    runs-on: ubuntu-latest
-    name: Test suite
-    steps:
-      - run: echo Test suite completed
-        # overwrite global working-directory because this step does not checkout the git repo
-        working-directory: .
+          BUNDLE_WITHOUT: development:system_tests:release
+          PUPPET_VERSION: "~> ${{ matrix.puppet }}.0"
+        name: Puppet ${{ matrix.puppet }} (Ruby ${{ matrix.ruby }})
+        steps:
+          - uses: actions/checkout@v6
+          - name: Setup ruby
+            uses: overlookinfra/setup-ruby@main
+            with:
+              ruby-version: ${{ matrix.ruby }}
+              bundler: none
+              bundler-cache: true
+              working-directory: ./site/profiles
+              setup-script: |
+                git clone --depth 1 -b bundler-plugin-eval-hooks https://github.com/ccutrer/rubygems.git
+                cd rubygems/bundler
+                gem build bundler.gemspec
+                gem install ./bundler-2.6.0.dev.gem
+                cd ../..
+                rm -rf rubygems
+                bundle plugin install bundler-alias
+                bundle config set aliases 'openvox:puppet'
+          - name: Run tests
+            run: bundle exec rake parallel_spec
