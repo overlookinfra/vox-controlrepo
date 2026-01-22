@@ -35,7 +35,6 @@ class profiles::prometheus {
     proxy_http_version  => '1.1',
     ipv6_enable         => true,
     http2               => 'on',
-    ipv6_listen_options => '',
     proxy_set_header    => [
       'Host $host',
       'X-Real-IP $remote_addr',
