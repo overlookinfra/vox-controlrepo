@@ -67,13 +67,13 @@ jobs:
           bundler-cache: true
           working-directory: ./site/profiles
           setup-script: |
-            git clone --depth 1 -b bundler-plugin-eval-hooks https://github.com/ccutrer/rubygems.git
-            cd rubygems/bundler
-            gem build bundler.gemspec
-            gem install ./bundler-2.6.0.dev.gem
-            cd ../..
-            rm -rf rubygems
-            bundle plugin install bundler-alias
+            git clone --depth 1 -b bundler-plugin-eval-hooks https://github.com/ccutrer/rubygems.git &&
+            cd rubygems/bundler &&
+            gem build bundler.gemspec &&
+            gem install ./bundler-2.6.0.dev.gem &&
+            cd ../.. &&
+            rm -rf rubygems &&
+            bundle plugin install bundler-alias &&
             bundle config set aliases 'puppet:openvox'
       - name: Run tests
         run: bundle exec rake parallel_spec
