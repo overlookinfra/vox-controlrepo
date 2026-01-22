@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Setup ruby
-        uses: overlookinfra/setup-ruby-this-does-not-exist@main
+        uses: overlookinfra/setup-ruby@main
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler: none
