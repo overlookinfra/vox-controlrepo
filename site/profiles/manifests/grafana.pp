@@ -99,6 +99,7 @@ class profiles::grafana (
     server_name         => [$domain, 'grafana.puppet.community', 'grafana.voxpupuli.org'],
     proxy_http_version  => '1.1',
     ipv6_enable         => true,
+    ipv6_listen_options => undef,
     http2               => 'on',
     add_header          => {
       'X-Frame-Options'         => 'DENY',
