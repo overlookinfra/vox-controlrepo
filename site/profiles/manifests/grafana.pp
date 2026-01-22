@@ -100,7 +100,6 @@ class profiles::grafana (
     proxy_http_version  => '1.1',
     ipv6_enable         => true,
     http2               => 'on',
-    ipv6_listen_options => '',
     add_header          => {
       'X-Frame-Options'         => 'DENY',
       'Content-Security-Policy' => "upgrade-insecure-requests; default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data: grafana.com; connect-src 'self' grafana.com; font-src 'self'; object-src 'none'; media-src 'none'; worker-src 'none'; frame-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'self';",
