@@ -34,6 +34,7 @@ class profiles::prometheus {
     server_name         => [$domain, 'prometheus.puppet.community', 'prometheus.voxpupuli.org'],
     proxy_http_version  => '1.1',
     ipv6_enable         => true,
+    ipv6_listen_options => undef,
     http2               => 'on',
     proxy_set_header    => [
       'Host $host',
