@@ -62,7 +62,15 @@ jobs:
           bundler: none
           bundler-cache: true
           working-directory: ./site/profiles
-          setup-script: "./bundler-setup.sh"
+          setup-script: |
+            git clone --depth 1 -b bundler-plugin-eval-hooks https://github.com/ccutrer/rubygems.git /tmp/rubygems
+            gem -C /tmp/rubygems/bundler build bundler.gemspec 
+            gem install /tmp/rubygems/bundler/bundler-2.6.0.dev.gem
+            bundle config set --local path vendor/bundle
+            bundle plugin install bundler-alias
+            bundle config set --local aliases puppet:openvox
+            bundle plugin list
+            bundle config list
       - name: Run tests
         run: bundle exec rake parallel_spec
 
@@ -93,5 +101,7 @@ jobs:
                 gem install /tmp/rubygems/bundler/bundler-2.6.0.dev.gem
                 bundle plugin install bundler-alias
                 bundle config set --local aliases openvox:puppet
+                bundle plugin list
+                bundle config list
           - name: Run tests
             run: bundle exec rake parallel_spec
