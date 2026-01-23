@@ -1,11 +1,10 @@
 # frozen_string_literal: true
-
 # Managed by modulesync - DO NOT EDIT
 # https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
 
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
-gem 'voxpupuli-test', '~> 10.1', require: false
+gem 'voxpupuli-test', '~> 13.2', require: false
 gem 'puppet_metadata', '~> 5.3', require: false
 
 puppetversion = ENV['PUPPET_GEM_VERSION'] || '>= 7.24'

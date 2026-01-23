@@ -46,7 +46,7 @@ class profiles::base (
   # disable services that talk to Canonical
   service { ['update-notifier-motd.timer', 'apt-news.service',  'esm-cache.service']:
     ensure => 'stopped',
-    enable => 'mask',
+    enable => false,
   }
 
   # remove apt hook that talks to canonical
