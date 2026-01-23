@@ -5,17 +5,10 @@
 
 source ENV['GEM_SOURCE'] || 'https://rubygems.org'
 
-group :test do
-  gem 'voxpupuli-test', '10.1.0', require: false
-  gem 'puppet_metadata', '~> 5.3', require: false
-end
-
-group :system_tests do
-  gem 'voxpupuli-acceptance', '~> 4.2', require: false
-end
+gem 'voxpupuli-test', '~> 10.1', require: false
+gem 'puppet_metadata', '~> 5.3', require: false
 
 puppetversion = ENV['PUPPET_GEM_VERSION'] || '>= 7.24'
 gem 'metadata_json_deps', require: false
 gem 'puppet', puppetversion, require: false, groups: [:test]
-gem 'syslog'
 # vim: syntax=ruby
